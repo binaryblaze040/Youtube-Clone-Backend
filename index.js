@@ -3,7 +3,7 @@ const express = require("express");
 const cors = require("cors");
 const mongodb = require("mongodb");
 const bcrypt = require("bcryptjs");
-
+const nodemailer = require('nodemailer');
 
 const URL = "mongodb+srv://binaryblaze:1234@cluster0.bpdbx.mongodb.net/myFirstDatabase?retryWrites=true&w=majority";
 const DB = "youtube";
@@ -11,6 +11,16 @@ const DB = "youtube";
 const app = express();
 app.use(express.json());
 app.use(cors());
+
+
+const transporter = nodemailer.createTransport({
+    service: 'gmail',
+    auth: {
+      user: 'pratick00714@gmail.com',
+      pass: 'letsread'
+    }
+});
+
 
 // check
 app.get("/", async (req, res) => {
@@ -421,7 +431,6 @@ app.post("/dislike", async (req, res) => {
 });
 
 
-// delete comment
 // delete video
 app.post("/deleteComment", async (req, res) => {
     try {
@@ -486,5 +495,66 @@ app.post("/views", async (req, res) => {
         });
     }
 });
+
+
+// reset password mail
+app.post("/resetpassword", async (req, res) => {
+
+    let mailContent = "Please follow this link to reset your password http://localhost:4200/resetPassword/" + req.body.email;
+
+    const mailOptions = {
+        from: 'pratick00714@gmail.com',
+        to: req.body.email,
+        subject: 'RESET PASSWORD from YOUTUBE-Clone',
+        text: mailContent
+    };
+      
+    transporter.sendMail(mailOptions, function(error, info){
+        if (error) 
+            res.status(500).json({
+                message : error
+            });
+        else
+            res.status(200).json({
+                message : 'Email sent: ' + info.response
+            });
+        
+    });
+});
+
+
+// reset the password of perticular email
+app.post("/resetpasswordrequest", async (req, res) => {
+    try {
+        let salt = await bcrypt.genSalt(10);
+        let hashPassword = await bcrypt.hash(req.body.password, salt);
+
+        let connection = await mongodb.MongoClient.connect(URL);
+        let db = connection.db(DB);
+        
+        await db.collection("users").updateOne(
+            {
+                email : req.body.email
+            },
+            {
+                $set : {
+                    password : hashPassword
+                }
+            }
+        );
+
+        await connection.close();
+        res.status(200).json({
+            message : "Password reset successful"
+        }); 
+
+    } catch (error) {
+        res.status(500).json({
+            message : error
+        });
+    }
+});
+
+
 
 app.listen(process.env.PORT || 8080);
