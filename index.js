@@ -146,6 +146,7 @@ app.post("/upload", async (req, res) => {
             description : req.body.description,
             tags : req.body.tags.split(","),
             user : req.body.user,
+            channel : req.body.channel,
             link : req.body.link,
             views : 0,
             comments : [],
