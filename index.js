@@ -149,6 +149,7 @@ app.post("/upload", async (req, res) => {
             tags : req.body.tags.split(","),
             user : req.body.user,
             channel : req.body.channel,
+            avatar : req.body.avatar,
             link : req.body.link,
             views : 0,
             comments : [],
