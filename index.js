@@ -46,6 +46,7 @@ app.post("/register", async (req, res) => {
             firstname : req.body.fname,
             lastname : req.body.lname,
             email : req.body.email,
+            avatar: req.body.avatar,
             password : hashPassword
         };
 
