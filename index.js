@@ -106,7 +106,8 @@ app.post("/login", async (req, res) => {
                 await connection.close();
                 res.status(200).json({
                     email : user.email,
-                    name : user.firstname + " " + user.lastname
+                    name : user.firstname + " " + user.lastname,
+                    avatar : user.avatar
                 });
             }
             else
